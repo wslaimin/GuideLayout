@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GuideLayout_Layout">
+        <attr name="group" format="integer"/>
+        <attr name="closed_anchor" format="boolean"/>
+        <attr name="anchor_gravity">
+            <flag name="left" value="3"/>
+            <flag name="right" value="5"/>
+            <flag name="top" value="48"/>
+            <flag name="bottom" value="80"/>
+        </attr>
+    </declare-styleable>
+</resources>

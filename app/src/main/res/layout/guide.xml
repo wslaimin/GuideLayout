@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lm.guidelayout.GuideLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_right_arrow"
+        app:closed_anchor="true"
+        app:anchor_gravity="right|bottom"
+        app:group="0" />
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_tip_bg"
+        app:layout_constraintTop_toBottomOf="@id/arrow"
+        app:layout_constraintLeft_toLeftOf="@id/arrow"
+        app:layout_constraintRight_toRightOf="@id/arrow"
+        app:group="0"/>
+
+    <ImageView
+        android:id="@+id/arrow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_left_arrow"
+        app:closed_anchor="true"
+        app:anchor_gravity="left|bottom"
+        app:group="1"/>
+
+    <ImageView
+        android:id="@+id/image1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_tip_bg"
+        app:layout_constraintTop_toBottomOf="@id/arrow1"
+        app:layout_constraintLeft_toLeftOf="@id/arrow1"
+        app:layout_constraintRight_toRightOf="@id/arrow1"
+        app:group="1"/>
+
+    <ImageView
+        android:id="@+id/arrow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_top_arrow"
+        app:closed_anchor="true"
+        app:anchor_gravity="top|right"
+        app:group="2"/>
+
+    <ImageView
+        android:id="@+id/image2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_guide_tip_bg"
+        app:layout_constraintBottom_toTopOf="@id/arrow2"
+        app:layout_constraintLeft_toLeftOf="@id/arrow2"
+        app:layout_constraintRight_toRightOf="@id/arrow2"
+        app:group="2"/>
+</com.lm.guidelayout.GuideLayout>
