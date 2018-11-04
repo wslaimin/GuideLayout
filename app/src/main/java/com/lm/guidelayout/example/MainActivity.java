@@ -1,4 +1,4 @@
-package example.guidelayout.lm.com.guidelayout;
+package com.lm.guidelayout.example;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void clickAnchor() {
                 guide.dismissGuide();
+                guide=null;
             }
         });
         guide.nextFrame(0);

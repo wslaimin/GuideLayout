@@ -36,3 +36,5 @@
 | setOffsetX(int offsetX)  | 离锚点X方向偏移量|
 | setOffsetY(int offsetY) | 离锚点Y方向偏移量 |
 | findViewById(int resId) | 根据寻找图层中的view |
+
+>不再使用GuideLayout对象，最好将引用置为null(防止内存泄漏)

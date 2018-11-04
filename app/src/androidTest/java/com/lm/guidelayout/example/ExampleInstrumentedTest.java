@@ -1,4 +1,4 @@
-package example.guidelayout.lm.com.guidelayout;
+package com.lm.guidelayout.example;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package example.guidelayout.lm.com.guidelayout;
+package com.lm.guidelayout.example;
 
 import org.junit.Test;
 
