@@ -2,13 +2,14 @@
 
 ## 思路
 灵感来源于PS的图层概念。
+
 1. 每个新手引导画面为一个图层
-2. 用ConstranitLayout作为画布容器，每个图层间的控件相互约束
+2. 容器显示图层以及背景色
 3. 通过设置锚点确定图层的位置(相当于PS中的可整体拖动图层)
 
 ## 效果演示
 
-![](https://www.github.com/wslaimin/GuideLayout/raw/master/screenshot/newer_guide.gif)
+![](./screenshot/newer_guide.gif)
 
 ## API
 
@@ -16,25 +17,26 @@
 
 | Name   | Type   | Default| Description|
 | ------ | ------ | ------ | ---------- |
-| group | integer | -1 | 图层位于那一层|
-| closed_anchor | boolean | false | 图层中最靠近锚点的控件 |
-| anchor_gravity | [left\|right]\|[top\|bottom] | left\|top  | 靠近锚点的位置 |
+| closest | boolean | false | 图层最靠近锚点控件|
+| to_anchor | [left\|right\|center_horizontal]\|<br>[top\|bottom\|center_vertical] | left\|top  | 靠近锚点的位置 |
+| to_anchor_x | dimension | 0 | 和锚点x偏移量|
+| to_anchor_y | dimension | 0 | 和锚点y偏移量|
 
 ### GuideLayout
 
 | Method | description|
 | ------ | ---------- |
-| nextFrame(int frame)  | 显示新手引导|
-| getFrame(int frame) | 获取图层 |
-| dismissGuide() | 取消新手引导  |
-| setBackgroundColor(int color) | 设置背景色  |
+| addFrame(int layoutId)  | 新增图层|
+| addFrame(GuideFrame view) | 新增图层 |
+| toFrame(int i) | 显示图层  |
+| getFrame(int index) | 获取图层  |
+| getFrameIndex() | 获取当前图层索引  |
+| dismiss() | 移除新手引导  |
 
 ### GuideFrame
 
 | Method | description|
 | ------ | ---------- |
-| setOffsetX(int offsetX)  | 离锚点X方向偏移量|
-| setOffsetY(int offsetY) | 离锚点Y方向偏移量 |
-| findViewById(int resId) | 根据寻找图层中的view |
-
->不再使用GuideLayout对象，最好将引用置为null(防止内存泄漏)
+| setAnchorView(View view)  | 设置锚点|
+| setAnchorRect(Rect rect) | 设置锚点 |
+| setDrawDecor(Decor drawDecor) | 设置Decor |
