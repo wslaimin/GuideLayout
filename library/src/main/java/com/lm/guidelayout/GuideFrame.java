@@ -1,167 +1,187 @@
 package com.lm.guidelayout;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Created by 10528 on 2018/10/14.
- */
-
-public class GuideFrame {
-    private List<View> views;
-    private View anchorView, closedAnchorView;
-    private int gravity;
+public class GuideFrame extends ConstraintLayout {
+    private View closestAnchorView;
+    private View anchorView;
     private Rect anchorRect;
-    private int anchorX, anchorY;
-    private ClickAnchorListener clickAnchorListener;
-    private int offsetX, offsetY;
     private ConstraintSet constraintSet = new ConstraintSet();
+    private Decor drawDecor;
+    private int toAnchor;
+    private int toAnchorX, toAnchorY;
+    private ViewTreeObserver.OnPreDrawListener onPreDrawListener1, onPreDrawListener2;
 
-    GuideFrame() {
-
+    public GuideFrame(Context context) {
+        this(context, null);
     }
 
-    void addView(View view) {
-        if (views == null) {
-            views = new ArrayList<>();
-        }
-        views.add(view);
+    public GuideFrame(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public GuideFrame(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        onPreDrawListener1 = new ViewTreeObserver.OnPreDrawListener() {
+            Rect rect = new Rect();
+
+            @Override
+            public boolean onPreDraw() {
+                if (rect.equals(anchorRect)) {
+                    return true;
+                }
+                rect = anchorRect;
+                anchor();
+                return false;
+            }
+        };
+        onPreDrawListener2 = new ViewTreeObserver.OnPreDrawListener() {
+            Rect rect = new Rect();
+
+            @Override
+            public boolean onPreDraw() {
+                if (anchorRect == null) {
+                    anchorRect = new Rect();
+                } else {
+                    anchorRect.setEmpty();
+                }
+                ViewGroup root = anchorView.getRootView().findViewById(android.R.id.content);
+                root.offsetDescendantRectToMyCoords(anchorView, anchorRect);
+                anchorRect.right += anchorView.getMeasuredWidth();
+                anchorRect.bottom += anchorView.getMeasuredHeight();
+
+                if (rect.equals(anchorRect)) {
+                    return true;
+                }
+                rect = anchorRect;
+                anchor();
+                return false;
+            }
+        };
     }
 
     public void setAnchorView(View view) {
-        anchorView = view;
+        this.anchorView = view;
+        getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener1);
+        getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener2);
+        getViewTreeObserver().addOnPreDrawListener(onPreDrawListener2);
     }
 
-    public void setClosedAnchorView(View view) {
-        closedAnchorView = view;
-        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if(left==oldLeft&&right==oldRight&&top==oldTop&&bottom==oldBottom){
-                    return;
-                }
-                Rect r = new Rect();
-                ViewGroup root = v.getRootView().findViewById(android.R.id.content);
-                root.offsetDescendantRectToMyCoords(anchorView, r);
-                anchorRect = new Rect();
-                anchorRect.left = r.left;
-                anchorRect.top = r.top;
-                anchorRect.right = anchorRect.left + anchorView.getMeasuredWidth();
-                anchorRect.bottom = anchorRect.top + anchorView.getMeasuredHeight();
-
-                final GuideLayout guideLayout = (GuideLayout) closedAnchorView.getParent();
-                constraintSet.clone(guideLayout);
-
-                switch (Gravity.getXGravity(gravity)) {
-                    case Gravity.LEFT:
-                        anchorX = anchorRect.left + offsetX;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closedAnchorView.getMeasuredWidth());
-                        break;
-                    case Gravity.RIGHT:
-                        anchorX = anchorRect.right + offsetX;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
-                        break;
-                    default:
-                        anchorX = anchorRect.left + offsetX;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closedAnchorView.getMeasuredWidth());
-                        break;
-                }
-
-                switch (Gravity.getYGravity(gravity)) {
-                    case Gravity.TOP:
-                        anchorY = anchorRect.top + offsetY;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closedAnchorView.getMeasuredHeight());
-                        break;
-                    case Gravity.BOTTOM:
-                        anchorY = anchorRect.bottom + offsetY;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
-                        break;
-                    default:
-                        anchorY = anchorRect.top + offsetY;
-                        constraintSet.connect(closedAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closedAnchorView.getMeasuredHeight());
-                        break;
-                }
-                closedAnchorView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        constraintSet.applyTo(guideLayout);
-                        for (View v : views) {
-                            v.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-            }
-        });
+    public void setAnchorRect(Rect rect) {
+        this.anchorRect = rect;
+        getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener1);
+        getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener2);
+        getViewTreeObserver().addOnPreDrawListener(onPreDrawListener1);
     }
 
-    public int getOffsetX() {
-        return offsetX;
+    public void setDrawDecor(Decor drawDecor) {
+        this.drawDecor = drawDecor;
     }
 
-    public void setOffsetX(int offsetX) {
-        this.offsetX = offsetX;
-    }
-
-    public int getOffsetY() {
-        return offsetY;
-    }
-
-    public void setOffsetY(int offsetY) {
-        this.offsetY = offsetY;
-    }
-
-    Rect getAnchorRect() {
-        return anchorRect;
-    }
-
-    void setGravity(int gravity) {
-        this.gravity = gravity;
-    }
-
-
-    public void setClickAnchorListener(ClickAnchorListener clickAnchorListener) {
-        this.clickAnchorListener = clickAnchorListener;
-    }
-
-    public View findViewById(int resId){
-        for(View view : views){
-            if(view.getId()==resId){
-                return view;
-            }
+    void drawDecor(Canvas canvas) {
+        if (drawDecor == null) {
+            drawDecor = new DefaultDecor();
         }
-        return null;
+        if (anchorRect != null) {
+            drawDecor.draw(canvas, anchorRect);
+        }
     }
 
-    void onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (anchorRect.contains((int) event.getX(), (int) event.getY())) {
-                    if (clickAnchorListener != null) {
-                        clickAnchorListener.clickAnchor();
-                    }
-                }
+    @Override
+    public ConstraintLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
+        LayoutParams childParams = (LayoutParams) params;
+        if (childParams.closest) {
+            closestAnchorView = child;
+            toAnchor = childParams.toAnchor == 0 ? Gravity.LEFT : childParams.toAnchor;
+            toAnchorX = childParams.toAnchorX;
+            toAnchorY = childParams.toAnchorY;
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+        return !anchorRect.contains((int)event.getX(),(int)event.getY());
+    }
+
+    private void anchor() {
+        constraintSet.clone(this);
+
+        int anchorX, anchorY;
+        switch (Gravity.getXGravity(toAnchor)) {
+            case Gravity.LEFT:
+                anchorX = anchorRect.left + toAnchorX;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closestAnchorView.getMeasuredWidth());
+                break;
+            case Gravity.RIGHT:
+                anchorX = anchorRect.right + toAnchorX;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
+                break;
+            case Gravity.CENTER_HORIZONTAL:
+                anchorX = anchorRect.centerX();
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
+                break;
+            default:
+                anchorX = anchorRect.left + toAnchorX;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closestAnchorView.getMeasuredWidth());
                 break;
         }
+
+        switch (Gravity.getYGravity(toAnchor)) {
+            case Gravity.TOP:
+                anchorY = anchorRect.top + toAnchorY;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closestAnchorView.getMeasuredHeight());
+                break;
+            case Gravity.BOTTOM:
+                anchorY = anchorRect.bottom + toAnchorY;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
+                break;
+            case Gravity.CENTER_VERTICAL:
+                anchorY = anchorRect.centerY();
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
+                break;
+            default:
+                anchorY = anchorRect.top + toAnchorY;
+                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closestAnchorView.getMeasuredHeight());
+                break;
+        }
+        constraintSet.applyTo(this);
     }
 
-    void disappear() {
-        for (View v : views) {
-            v.setVisibility(View.GONE);
+    public static class LayoutParams extends ConstraintLayout.LayoutParams {
+        boolean closest;
+        int toAnchor;
+        int toAnchorX, toAnchorY;
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+            TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.GuideFrame2_Layout);
+            closest = a.getBoolean(R.styleable.GuideFrame2_Layout_closest, false);
+            toAnchor = a.getInt(R.styleable.GuideFrame2_Layout_to_anchor, 0);
+            toAnchorX = a.getDimensionPixelSize(R.styleable.GuideFrame2_Layout_to_anchor_x, 0);
+            toAnchorY = a.getDimensionPixelSize(R.styleable.GuideFrame2_Layout_to_anchor_y, 0);
+            a.recycle();
         }
+
     }
 
-    /**直接設置成VISIBLE會有位置在左上角再移動到相應位置的情況
-     * 先測量，實際在onLayoutChange()監聽中顯示
-     */
-    void appear() {
-        for (View v : views) {
-            v.setVisibility(View.INVISIBLE);
-        }
+    public interface Decor {
+        void draw(Canvas canvas, Rect rect);
     }
 }

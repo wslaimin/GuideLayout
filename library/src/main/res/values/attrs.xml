@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="GuideLayout_Layout">
-        <attr name="group" format="integer"/>
-        <attr name="closed_anchor" format="boolean"/>
-        <attr name="anchor_gravity">
+    <declare-styleable name="GuideFrame2_Layout">
+        <attr name="closest" format="boolean"/>
+        <attr name="to_anchor">
             <flag name="left" value="3"/>
             <flag name="right" value="5"/>
+            <flag name="center_horizontal" value="9"/>
             <flag name="top" value="48"/>
             <flag name="bottom" value="80"/>
+            <flag name="center_vertical" value="126"/>
         </attr>
+        <attr name="to_anchor_x" format="dimension"/>
+        <attr name="to_anchor_y" format="dimension"/>
     </declare-styleable>
 </resources>
