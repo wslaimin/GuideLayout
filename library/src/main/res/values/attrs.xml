@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="GuideFrame2_Layout">
-        <attr name="closest" format="boolean"/>
+    <declare-styleable name="GuideFrame_Layout">
+        <attr name="closest" format="boolean" />
         <attr name="to_anchor">
-            <flag name="left" value="3"/>
-            <flag name="right" value="5"/>
-            <flag name="center_horizontal" value="9"/>
-            <flag name="top" value="48"/>
-            <flag name="bottom" value="80"/>
-            <flag name="center_vertical" value="126"/>
+            <flag name="left_to_left" value="3" />
+            <flag name="left_to_right" value="5" />
+            <flag name="right_to_left" value="7" />
+            <flag name="right_to_right" value="9" />
+            <flag name="center_horizontal" value="11" />
+            <flag name="top_to_top" value="17" />
+            <flag name="top_to_bottom" value="33" />
+            <flag name="bottom_to_top" value="49" />
+            <flag name="bottom_to_bottom" value="65" />
+            <flag name="center_vertical" value="81" />
         </attr>
-        <attr name="to_anchor_x" format="dimension"/>
-        <attr name="to_anchor_y" format="dimension"/>
+        <attr name="to_anchor_x" format="dimension" />
+        <attr name="to_anchor_y" format="dimension" />
     </declare-styleable>
 </resources>

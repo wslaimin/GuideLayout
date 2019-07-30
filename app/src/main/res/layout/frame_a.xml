@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_guide_right_arrow"
         app:closest="true"
-        app:to_anchor="right|bottom"
+        app:to_anchor="left_to_right|top_to_bottom"
         app:to_anchor_x="10dp"
         app:to_anchor_y="10dp"/>
 

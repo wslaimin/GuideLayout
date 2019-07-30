@@ -47,6 +47,7 @@ public class GuideFrame extends ConstraintLayout {
         };
         onPreDrawListener2 = new ViewTreeObserver.OnPreDrawListener() {
             Rect rect = new Rect();
+            int count=0;
 
             @Override
             public boolean onPreDraw() {
@@ -55,16 +56,21 @@ public class GuideFrame extends ConstraintLayout {
                 } else {
                     anchorRect.setEmpty();
                 }
+
                 ViewGroup root = anchorView.getRootView().findViewById(android.R.id.content);
                 root.offsetDescendantRectToMyCoords(anchorView, anchorRect);
                 anchorRect.right += anchorView.getMeasuredWidth();
                 anchorRect.bottom += anchorView.getMeasuredHeight();
-
                 if (rect.equals(anchorRect)) {
+                    count++;
+                    if(count>=2){
+                        count=0;
+                    }else{
+                        anchor();
+                    }
                     return true;
                 }
                 rect = anchorRect;
-                anchor();
                 return false;
             }
         };
@@ -108,7 +114,7 @@ public class GuideFrame extends ConstraintLayout {
         LayoutParams childParams = (LayoutParams) params;
         if (childParams.closest) {
             closestAnchorView = child;
-            toAnchor = childParams.toAnchor == 0 ? Gravity.LEFT : childParams.toAnchor;
+            toAnchor = childParams.toAnchor == 0 ? Gravity.LEFT_TO_LEFT|Gravity.TOP_TO_TOP : childParams.toAnchor;
             toAnchorX = childParams.toAnchorX;
             toAnchorY = childParams.toAnchorY;
         }
@@ -125,42 +131,50 @@ public class GuideFrame extends ConstraintLayout {
 
         int anchorX, anchorY;
         switch (Gravity.getXGravity(toAnchor)) {
-            case Gravity.LEFT:
+            case Gravity.LEFT_TO_LEFT:
                 anchorX = anchorRect.left + toAnchorX;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closestAnchorView.getMeasuredWidth());
                 break;
-            case Gravity.RIGHT:
-                anchorX = anchorRect.right + toAnchorX;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
+            case Gravity.LEFT_TO_RIGHT:
+                anchorX=anchorRect.right+toAnchorX;
+                break;
+            case Gravity.RIGHT_TO_LEFT:
+                anchorX=anchorRect.left-closestAnchorView.getMeasuredWidth()+toAnchorX;
+                break;
+            case Gravity.RIGHT_TO_RIGHT:
+                anchorX=anchorRect.right-closestAnchorView.getMeasuredWidth()+toAnchorX;
                 break;
             case Gravity.CENTER_HORIZONTAL:
-                anchorX = anchorRect.centerX();
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
+                anchorX = anchorRect.centerX()-closestAnchorView.getMeasuredWidth()/2;
                 break;
             default:
-                anchorX = anchorRect.left + toAnchorX;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX - closestAnchorView.getMeasuredWidth());
+                anchorX = anchorRect.centerX()-closestAnchorView.getMeasuredWidth()/2;
                 break;
         }
 
+        constraintSet.connect(closestAnchorView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, anchorX);
+
         switch (Gravity.getYGravity(toAnchor)) {
-            case Gravity.TOP:
+            case Gravity.TOP_TO_TOP:
                 anchorY = anchorRect.top + toAnchorY;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closestAnchorView.getMeasuredHeight());
                 break;
-            case Gravity.BOTTOM:
+            case Gravity.TOP_TO_BOTTOM:
                 anchorY = anchorRect.bottom + toAnchorY;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
+                break;
+            case Gravity.BOTTOM_TO_TOP:
+                anchorY=anchorRect.top-closestAnchorView.getMeasuredHeight()+toAnchorY;
+                System.out.println("anchorY:"+anchorY);
+                break;
+            case Gravity.BOTTOM_TO_BOTTOM:
+                anchorY=anchorRect.bottom-closestAnchorView.getMeasuredHeight()+toAnchorY;
                 break;
             case Gravity.CENTER_VERTICAL:
-                anchorY = anchorRect.centerY();
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
+                anchorY = anchorRect.centerY()-closestAnchorView.getMeasuredHeight()/2+toAnchorY;
                 break;
             default:
-                anchorY = anchorRect.top + toAnchorY;
-                constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY - closestAnchorView.getMeasuredHeight());
+                anchorY = anchorRect.centerY()-closestAnchorView.getMeasuredHeight()/2+toAnchorY;
                 break;
         }
+        constraintSet.connect(closestAnchorView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, anchorY);
         constraintSet.applyTo(this);
     }
 
@@ -171,11 +185,11 @@ public class GuideFrame extends ConstraintLayout {
 
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
-            TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.GuideFrame2_Layout);
-            closest = a.getBoolean(R.styleable.GuideFrame2_Layout_closest, false);
-            toAnchor = a.getInt(R.styleable.GuideFrame2_Layout_to_anchor, 0);
-            toAnchorX = a.getDimensionPixelSize(R.styleable.GuideFrame2_Layout_to_anchor_x, 0);
-            toAnchorY = a.getDimensionPixelSize(R.styleable.GuideFrame2_Layout_to_anchor_y, 0);
+            TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.GuideFrame_Layout);
+            closest = a.getBoolean(R.styleable.GuideFrame_Layout_closest, false);
+            toAnchor = a.getInt(R.styleable.GuideFrame_Layout_to_anchor, 0);
+            toAnchorX = a.getDimensionPixelSize(R.styleable.GuideFrame_Layout_to_anchor_x, 0);
+            toAnchorY = a.getDimensionPixelSize(R.styleable.GuideFrame_Layout_to_anchor_y, 0);
             a.recycle();
         }
 

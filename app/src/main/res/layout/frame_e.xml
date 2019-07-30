@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_guide_left_arrow"
         app:closest="true"
-        app:to_anchor="left|bottom" />
+        app:to_anchor="right_to_left|top_to_bottom" />
 
     <ImageView
         android:id="@+id/image"
