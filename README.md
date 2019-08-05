@@ -18,7 +18,7 @@
 | Name   | Type   | Default| Description|
 | ------ | ------ | ------ | ---------- |
 | closest | boolean | false | 图层最靠近锚点控件|
-| to_anchor | [left\|right\|center_horizontal]\|<br>[top\|bottom\|center_vertical] | left\|top  | 靠近锚点的位置 |
+| to_anchor | [left_to_left\|left_to_right\|right_to_left\|right_to_right\|center_horizontal]\|<br>[top_to_top\|top_to_bottom\|bottom_to_top\|bottom_to_bottom\|center_vertical] | left_to_left\|top_to_top  | 靠近锚点的位置 |
 | to_anchor_x | dimension | 0 | 和锚点x偏移量|
 | to_anchor_y | dimension | 0 | 和锚点y偏移量|
 
